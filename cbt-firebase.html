@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT Exam System</title>
+<style>
+/* ============================= RESET ============================= */
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height:100vh;
+  color:#222;
+}
+a { text-decoration:none; color:inherit; }
+button { cursor:pointer; font-family:inherit; border:none; }
+
+/* ============================= ANIMATIONS ============================= */
+@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+@keyframes slideIn { from{opacity:0; transform:translateX(-20px);} to{opacity:1; transform:translateX(0);} }
+@keyframes bounce { 0%,20%,50%,80%,100%{transform:translateY(0);} 40%{transform:translateY(-12px);} 60%{transform:translateY(-6px);} }
+@keyframes pulse { 0%{ box-shadow:0 0 0 0 rgba(220,53,69,.6);} 70%{ box-shadow:0 0 0 12px rgba(220,53,69,0);} 100%{ box-shadow:0 0 0 0 rgba(220,53,69,0);} }
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes glow { 0%,100%{ box-shadow:0 4px 14px rgba(102,126,234,.25);} 50%{ box-shadow:0 8px 26px rgba(118,75,162,.5);} }
+
+.fade-in { animation: fadeIn .5s ease both; }
+.slide-in { animation: slideIn .45s ease both; }
+.bounce { animation: bounce 2s infinite; display:inline-block; }
+
+/* ============================= NAVBAR ============================= */
+nav {
+  position:sticky; top:0; z-index:100;
+  background:rgba(255,255,255,.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding:14px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:10px;
+  box-shadow:0 2px 12px rgba(0,0,0,.1);
+}
+.brand { font-size:1.4rem; font-weight:800; color:#fff; letter-spacing:.5px; }
+.brand span { display:inline-block; }
+.nav-links { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.nav-links button, .nav-links a.navbtn {
+  background:rgba(255,255,255,.2); color:#fff; padding:8px 16px;
+  border-radius:24px; font-weight:600; font-size:.9rem;
+  transition:all .25s ease;
+}
+.nav-links button:hover, .nav-links a.navbtn:hover { background:#fff; color:#764ba2; transform:translateY(-2px); }
+.nav-tag { background:rgba(255,255,255,.25); color:#fff; padding:6px 14px; border-radius:20px; font-size:.85rem; font-weight:600; }
+
+/* ============================= CONTAINERS ============================= */
+.container { max-width:1100px; margin:0 auto; padding:30px 20px 60px; }
+.card {
+  background:#fff; border-radius:16px; padding:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+  margin-bottom:24px;
+}
+.card h2 { margin-bottom:14px; color:#4b3384; }
+.card h3 { margin-bottom:10px; color:#4b3384; }
+
+/* ============================= HERO ============================= */
+.hero { text-align:center; color:#fff; padding:70px 20px 40px; }
+.hero h1 { font-size:2.6rem; margin-bottom:14px; }
+.hero p { font-size:1.1rem; opacity:.9; margin-bottom:26px; }
+.hero-buttons { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+
+.features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:40px; }
+.feature-card {
+  background:#fff; border-radius:16px; padding:26px; text-align:center;
+  box-shadow:0 10px 26px rgba(0,0,0,.15); transition:transform .3s ease;
+}
+.feature-card:hover { transform:translateY(-8px); animation:glow 1.6s infinite; }
+.feature-card .icon { font-size:2.4rem; margin-bottom:10px; }
+.feature-card h3 { color:#4b3384; margin-bottom:8px; }
+.feature-card p { color:#555; font-size:.92rem; }
+
+/* ============================= BUTTONS ============================= */
+.btn {
+  display:inline-block; padding:11px 26px; border-radius:10px; font-weight:700;
+  font-size:.95rem; transition:all .25s ease; border:none;
+}
+.btn-primary { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(102,126,234,.5); }
+.btn-outline { background:#fff; color:#667eea; border:2px solid #fff; }
+.btn-outline:hover { transform:translateY(-2px); }
+.btn-success { background:linear-gradient(135deg,#2ecc71,#27ae60); color:#fff; }
+.btn-success:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(46,204,113,.5); }
+.btn-danger { background:linear-gradient(135deg,#eb4d4b,#c0392b); color:#fff; }
+.btn-danger:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(235,77,75,.5); }
+.btn-word { background:linear-gradient(135deg,#2b579a,#1e3f6f); color:#fff; }
+.btn-word:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(43,87,154,.5); }
+.btn-sm { padding:7px 14px; font-size:.82rem; border-radius:8px; }
+.btn-block { width:100%; }
+.btn:disabled { opacity:.55; cursor:not-allowed; transform:none !important; box-shadow:none !important; }
+
+/* ============================= FORMS ============================= */
+.form-group { margin-bottom:16px; }
+label { display:block; font-weight:600; margin-bottom:6px; color:#444; font-size:.9rem; }
+input, select, textarea {
+  width:100%; padding:11px 14px; border:2px solid #e2e2f5; border-radius:10px;
+  font-size:.95rem; transition:border-color .2s ease; background:#fafaff;
+}
+input:focus, select:focus, textarea:focus { outline:none; border-color:#764ba2; }
+.form-narrow { max-width:440px; margin:0 auto; }
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width:600px){ .grid-2{ grid-template-columns:1fr; } .features-grid{ grid-template-columns:1fr; } }
+
+/* ============================= TABLES ============================= */
+table { width:100%; border-collapse:collapse; margin-top:10px; }
+th, td { padding:12px 14px; text-align:left; border-bottom:1px solid #eee; font-size:.9rem; }
+th { background:#f4f2fc; color:#4b3384; font-weight:700; }
+tr { transition:background .2s ease; }
+tbody tr:hover { background:#faf9ff; }
+.table-wrap { overflow-x:auto; }
+.badge { padding:4px 10px; border-radius:20px; font-size:.75rem; font-weight:700; }
+.badge-pass { background:#d4f7dc; color:#1a7a3c; }
+.badge-fail { background:#fbdada; color:#a32323; }
+.badge-role { background:#e6e0fb; color:#4b3384; text-transform:capitalize; }
+
+/* ============================= STATS ============================= */
+.stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:26px; }
+.stat-card {
+  background:#fff; border-radius:16px; padding:24px; text-align:center;
+  box-shadow:0 8px 22px rgba(0,0,0,.12); transition:transform .3s ease;
+}
+.stat-card:hover { transform:translateY(-6px); animation:glow 1.6s infinite; }
+.stat-card .num { font-size:2.2rem; font-weight:800; color:#764ba2; }
+.stat-card .label { color:#666; font-size:.9rem; margin-top:4px; }
+@media (max-width:700px){ .stats-grid{ grid-template-columns:1fr; } }
+
+/* ============================= TABS ============================= */
+.tabs { display:flex; gap:10px; margin-bottom:22px; flex-wrap:wrap; }
+.tab-btn {
+  background:#f0eefc; color:#4b3384; padding:10px 20px; border-radius:10px;
+  font-weight:700; font-size:.9rem; transition:all .2s ease;
+}
+.tab-btn.active { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+
+/* ============================= EXAM PAGE ============================= */
+.exam-header {
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;
+  background:#fff; border-radius:16px; padding:20px 26px; margin-bottom:22px;
+  box-shadow:0 8px 22px rgba(0,0,0,.12); position:sticky; top:78px; z-index:50;
+}
+.timer {
+  background:#dc3545; color:#fff; padding:10px 22px; border-radius:30px;
+  font-weight:800; font-size:1.2rem; animation:pulse 1.6s infinite;
+}
+.q-box {
+  background:#fff; border-radius:14px; padding:22px; margin-bottom:18px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+.q-box .q-title { font-weight:700; margin-bottom:14px; color:#333; }
+.option-row {
+  display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:10px;
+  border:2px solid #eee; margin-bottom:8px; cursor:pointer; transition:all .2s ease;
+}
+.option-row:hover { border-color:#c9c0f2; background:#faf9ff; }
+.option-row.selected { border-color:#764ba2; background:#f0eefc; }
+.option-row input { width:auto; }
+
+/* ============================= LOADER ============================= */
+.loader-overlay {
+  position:fixed; inset:0; background:rgba(102,126,234,.25); backdrop-filter:blur(3px);
+  display:flex; align-items:center; justify-content:center; z-index:999;
+}
+.spinner {
+  width:54px; height:54px; border:6px solid #fff; border-top-color:#764ba2;
+  border-radius:50%; animation:spin .8s linear infinite;
+}
+.hidden { display:none !important; }
+
+/* ============================= ALERTS ============================= */
+#alertBox { position:fixed; top:20px; right:20px; z-index:1000; display:flex; flex-direction:column; gap:10px; }
+.alert {
+  padding:14px 20px; border-radius:10px; color:#fff; font-weight:600; min-width:240px;
+  box-shadow:0 8px 22px rgba(0,0,0,.2); animation:slideIn .3s ease both;
+}
+.alert-success { background:#27ae60; }
+.alert-error { background:#c0392b; }
+.alert-info { background:#2980b9; }
+
+.muted { color:#777; font-size:.88rem; }
+.center { text-align:center; }
+.mt10{margin-top:10px;} .mt20{margin-top:20px;} .mb10{margin-bottom:10px;}
+footer { text-align:center; color:#fff; opacity:.85; padding:26px; font-size:.85rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand"><span class="bounce">📝</span> CBT Exam System</div>
+  <div class="nav-links" id="navLinks"></div>
+</nav>
+
+<div id="app"></div>
+
+<footer>CBT Exam System &middot; Powered by Firebase</footer>
+
+<div id="alertBox"></div>
+<div id="loaderOverlay" class="loader-overlay hidden"><div class="spinner"></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script type="module">
+/* =========================================================================
+   SECTION 1: FIREBASE IMPORTS (CDN, modular SDK v10.7.0)
+========================================================================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  signInAnonymously, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc,
+  updateDoc, deleteDoc, query, where, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+/* =========================================================================
+   SECTION 2: FIREBASE CONFIG
+========================================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyA8d2AAafTQt5-cXeVmlFpLVu1_5xvrkmo",
+  authDomain: "exam-office.firebaseapp.com",
+  projectId: "exam-office",
+  storageBucket: "exam-office.firebasestorage.app",
+  messagingSenderId: "148163576058",
+  appId: "1:148163576058:web:5b5b5591aef78467c6c943"
+};
+
+/* =========================================================================
+   SECTION 3: INITIALIZE FIREBASE
+========================================================================= */
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Classes students choose from when starting an exam (Primary 4 – SS 3)
+const CLASS_LIST = ['Primary 4','Primary 5','Primary 6','JSS 1','JSS 2','JSS 3','SS 1','SS 2','SS 3'];
+
+/* =========================================================================
+   SECTION 4: GLOBAL STATE
+========================================================================= */
+let currentUser = null;      // { id, name, email, role } — teachers/admins only
+let currentPage = 'home';
+let pageParams = {};
+let activeTab = {};
+let selectedAnswers = {};
+let examTimerInterval = null;
+let authReady = false;
+
+/* =========================================================================
+   SECTION 5: HELPER FUNCTIONS (alerts, loader, navigation)
+========================================================================= */
+function showAlert(message, type='info'){
+  const box = document.getElementById('alertBox');
+  const div = document.createElement('div');
+  div.className = 'alert alert-' + type;
+  div.textContent = message;
+  box.appendChild(div);
+  setTimeout(() => div.remove(), 4000);
+}
+function showLoader(){ document.getElementById('loaderOverlay').classList.remove('hidden'); }
+function hideLoader(){ document.getElementById('loaderOverlay').classList.add('hidden'); }
+
+function navigateTo(page, params={}){
+  currentPage = page;
+  pageParams = params;
+  window.scrollTo(0,0);
+  render();
+}
+function switchTab(dashboard, tab){
+  activeTab[dashboard] = tab;
+  render();
+}
+Object.assign(window, { navigateTo, switchTab });
+
+// Students never see a login step. To still require *some* authenticated
+// session for Firestore writes (so exam results can't be spammed by bare
+// HTTP requests with no session at all), every guest is silently signed in
+// anonymously the first time they need to read/write exam data. This is
+// invisible to the user — no form, no password — and never overrides a real
+// teacher/admin session (it only fires when nobody is signed in at all).
+// Requires Anonymous sign-in to be enabled in Firebase Authentication.
+async function ensureAnonAuth(){
+  if (!auth.currentUser) {
+    try { await signInAnonymously(auth); } catch (e) { console.error('Anonymous sign-in failed', e); }
+  }
+}
+
+/* =========================================================================
+   SECTION 6: AUTH FUNCTIONS (teachers & admin only)
+========================================================================= */
+async function registerTeacher(name, email, password){
+  if (!name || !email || !password) { showAlert('Please fill in all required fields.', 'error'); return; }
+  showLoader();
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      name, email, role: 'teacher', createdAt: serverTimestamp()
+    });
+    await signOut(auth);
+    showAlert('Registration successful! Please log in.', 'success');
+    navigateTo('login');
+  } catch (err) {
+    showAlert(friendlyAuthError(err), 'error');
+  } finally { hideLoader(); }
+}
+
+async function loginUser(email, password){
+  if (!email || !password) { showAlert('Please enter email and password.', 'error'); return; }
+  showLoader();
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    // onAuthStateChanged handles loading profile + navigation
+  } catch (err) {
+    showAlert(friendlyAuthError(err), 'error');
+    hideLoader();
+  }
+}
+
+async function logout(){
+  await signOut(auth);
+  currentUser = null;
+  showAlert('You have been logged out.', 'info');
+  navigateTo('home');
+}
+
+function friendlyAuthError(err){
+  const code = err.code || '';
+  if (code.includes('email-already-in-use')) return 'An account with this email already exists.';
+  if (code.includes('invalid-credential') || code.includes('wrong-password') || code.includes('user-not-found')) return 'Invalid email or password.';
+  if (code.includes('weak-password')) return 'Password should be at least 6 characters.';
+  if (code.includes('invalid-email')) return 'Please enter a valid email address.';
+  if (code.includes('admin-restricted-operation')) return 'Anonymous sign-in is not enabled for this Firebase project yet — see the setup guide.';
+  return 'Something went wrong: ' + (err.message || code);
+}
+
+// One-tap creation of the default admin account. Always available on the
+// login page. If admin@cbt.com already exists, Firebase simply rejects the
+// creation attempt and we show a friendly message instead of erroring.
+async function setupDefaultAdmin(){
+  showLoader();
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, 'admin@cbt.com', 'admin123');
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      name: 'System Admin', email: 'admin@cbt.com', role: 'admin', createdAt: serverTimestamp()
+    });
+    await signOut(auth);
+    showAlert('Admin account created! Login with admin@cbt.com / admin123', 'success');
+    navigateTo('login');
+  } catch (err) {
+    if ((err.code||'').includes('email-already-in-use')) {
+      showAlert('An admin account already exists — just log in below with admin@cbt.com.', 'info');
+    } else {
+      showAlert('Could not create admin: ' + err.message, 'error');
+    }
+  } finally { hideLoader(); }
+}
+
+// Auto-login on page refresh for teachers/admins. Anonymous sessions (used
+// for guest exam-takers) are deliberately ignored here — they never become
+// an app "currentUser".
+onAuthStateChanged(auth, async (user) => {
+  authReady = true;
+  if (user && !user.isAnonymous) {
+    showLoader();
+    try {
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) {
+        currentUser = { id: user.uid, ...snap.data() };
+        if (currentPage === 'home' || currentPage === 'login' || currentPage === 'register') {
+          currentPage = currentUser.role === 'admin' ? 'admin' : 'teacher';
+        }
+      } else {
+        currentUser = null;
+      }
+    } catch (e) {
+      showAlert('Could not load your profile: ' + e.message, 'error');
+    } finally {
+      hideLoader();
+      render();
+    }
+  } else {
+    currentUser = null;
+    render();
+  }
+});
+
+/* =========================================================================
+   SECTION 7: DATABASE FUNCTIONS (Firestore CRUD)
+========================================================================= */
+async function fetchCollection(name, filters=[]){
+  let q = collection(db, name);
+  if (filters.length) q = query(collection(db, name), ...filters.map(f => where(f[0], f[1], f[2])));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id:d.id, ...d.data() }));
+}
+
+async function createExam(title, subject, duration, passMark){
+  if (!title || !subject || !duration || !passMark) { showAlert('Please fill in all exam fields.', 'error'); return; }
+  showLoader();
+  try {
+    const ref = await addDoc(collection(db, 'exams'), {
+      title, subject, duration:Number(duration), passMark:Number(passMark),
+      totalMarks:0, teacherId:currentUser.id, teacherName:currentUser.name,
+      status:'published', createdAt: serverTimestamp()
+    });
+    showAlert('Exam created! Now add some questions.', 'success');
+    navigateTo('questions', { examId: ref.id });
+  } catch (err) { showAlert('Error creating exam: ' + err.message, 'error'); }
+  finally { hideLoader(); }
+}
+
+async function deleteExam(examId){
+  if (!confirm('Delete this exam and all its questions/results? This cannot be undone.')) return;
+  showLoader();
+  try {
+    // Delete children first (questions, attempts) while the exam doc still
+    // exists — the attempts delete rule looks up the exam's teacherId, so
+    // deleting the exam itself first would break that lookup.
+    const qs = await fetchCollection('questions', [['examId','==',examId]]);
+    for (const q of qs) await deleteDoc(doc(db, 'questions', q.id));
+    const as = await fetchCollection('attempts', [['examId','==',examId]]);
+    for (const a of as) await deleteDoc(doc(db, 'attempts', a.id));
+    await deleteDoc(doc(db, 'exams', examId));
+    showAlert('Exam deleted.', 'success');
+    navigateTo(currentUser.role === 'admin' ? 'admin' : 'teacher');
+  } catch (err) { showAlert('Error deleting exam: ' + err.message, 'error'); }
+  finally { hideLoader(); }
+}
+
+async function addQuestion(examId, text, marks, options, correctIndex){
+  if (!text || options.some(o => !o) || correctIndex === null) { showAlert('Please complete the question, all 4 options, and mark the correct answer.', 'error'); return; }
+  showLoader();
+  try {
+    await addDoc(collection(db, 'questions'), { examId, text, marks:Number(marks)||1, options, correctIndex:Number(correctIndex) });
+    const qs = await fetchCollection('questions', [['examId','==',examId]]);
+    const totalMarks = qs.reduce((s,q)=>s+q.marks,0);
+    await updateDoc(doc(db, 'exams', examId), { totalMarks });
+    showAlert('Question added.', 'success');
+    render();
+  } catch (err) { showAlert('Error adding question: ' + err.message, 'error'); }
+  finally { hideLoader(); }
+}
+
+async function deleteQuestion(qId, examId){
+  if (!confirm('Delete this question?')) return;
+  showLoader();
+  try {
+    await deleteDoc(doc(db, 'questions', qId));
+    const qs = await fetchCollection('questions', [['examId','==',examId]]);
+    const totalMarks = qs.reduce((s,q)=>s+q.marks,0);
+    await updateDoc(doc(db, 'exams', examId), { totalMarks });
+    render();
+  } catch (err) { showAlert('Error deleting question: ' + err.message, 'error'); }
+  finally { hideLoader(); }
+}
+
+/* =========================================================================
+   SECTION 8: GUEST EXAM-TAKING FLOW (no account, just name + class)
+========================================================================= */
+function beginExam(examId, name, studentClass){
+  if (!name || !name.trim()) { showAlert('Please enter your full name.', 'error'); return; }
+  if (!studentClass) { showAlert('Please select your class.', 'error'); return; }
+  if (localStorage.getItem('cbt_done_' + examId)) { showAlert('This exam was already completed on this device.', 'error'); return; }
+  selectedAnswers = {};
+  localStorage.setItem('cbt_start_' + examId, Date.now().toString());
+  navigateTo('exam', { examId, studentName: name.trim(), studentClass });
+}
+
+function selectAnswer(questionId, optionIndex){
+  selectedAnswers[questionId] = optionIndex;
+  render();
+}
+
+async function submitExam(examId, auto=false){
+  if (examTimerInterval) clearInterval(examTimerInterval);
+  showLoader();
+  try {
+    await ensureAnonAuth();
+    const questions = await fetchCollection('questions', [['examId','==',examId]]);
+    const examSnap = await getDoc(doc(db, 'exams', examId));
+    const exam = { id: examId, ...examSnap.data() };
+    let score = 0;
+    questions.forEach(q => { if (selectedAnswers[q.id] === q.correctIndex) score += q.marks; });
+    const percentage = exam.totalMarks > 0 ? Math.round((score / exam.totalMarks) * 100) : 0;
+    const passed = percentage >= exam.passMark;
+    await addDoc(collection(db, 'attempts'), {
+      examId, studentName: pageParams.studentName, studentClass: pageParams.studentClass,
+      score, totalMarks: exam.totalMarks, percentage, passed,
+      answers: selectedAnswers, submittedAt: serverTimestamp()
+    });
+    localStorage.setItem('cbt_done_' + examId, '1');
+    localStorage.removeItem('cbt_start_' + examId);
+    navigateTo('exam-done', { title: exam.title, score, totalMarks: exam.totalMarks, percentage, passed });
+  } catch (err) { showAlert('Error submitting exam: ' + err.message, 'error'); }
+  finally { hideLoader(); }
+}
+
+/* =========================================================================
+   SECTION 9: EXPORTS — Word (.doc), PDF, and copy-to-clipboard
+========================================================================= */
+function exportToWord(title, headers, rows, filename){
+  let tableRows = '<tr>' + headers.map(h => `<th style="border:1px solid #764ba2;background:#f0eefc;padding:8px;">${h}</th>`).join('') + '</tr>';
+  rows.forEach(r => {
+    tableRows += '<tr>' + r.map(c => `<td style="border:1px solid #ccc;padding:8px;">${c}</td>`).join('') + '</tr>';
+  });
+  const html = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+    <head><meta charset="utf-8"><title>${title}</title></head>
+    <body>
+      <h2 style="color:#4b3384;">${title}</h2>
+      <p style="color:#666;">Generated on ${new Date().toLocaleString()}</p>
+      <table style="border-collapse:collapse;width:100%;">${tableRows}</table>
+    </body></html>`;
+  const blob = new Blob(['\ufeff', html], { type:'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename.endsWith('.doc') ? filename : filename + '.doc';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showAlert('Word document downloaded.', 'success');
+}
+
+function exportToPDF(title, headers, rows, filename){
+  if (!window.jspdf) { showAlert('PDF library did not load — check your internet connection.', 'error'); return; }
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  pdf.setFontSize(16);
+  pdf.setTextColor(118, 75, 162);
+  pdf.text(title, 14, 18);
+  pdf.setFontSize(10);
+  pdf.setTextColor(100);
+  pdf.text('Generated on ' + new Date().toLocaleString(), 14, 25);
+  if (typeof pdf.autoTable === 'function') {
+    pdf.autoTable({ startY: 32, head: [headers], body: rows, headStyles: { fillColor: [118,75,162] }, styles: { fontSize: 9 } });
+  } else {
+    // Fallback if the autoTable plugin failed to load: plain text rows
+    let y = 34;
+    pdf.text(headers.join('   |   '), 14, y);
+    rows.forEach(r => { y += 7; pdf.text(r.join('   |   '), 14, y); });
+  }
+  pdf.save(filename.endsWith('.pdf') ? filename : filename + '.pdf');
+  showAlert('PDF downloaded.', 'success');
+}
+
+function copyResultsToClipboard(headers, rows){
+  const text = [headers.join('\t'), ...rows.map(r => r.join('\t'))].join('\n');
+  navigator.clipboard.writeText(text)
+    .then(() => showAlert('Copied! Paste directly into Excel or Word.', 'success'))
+    .catch(() => showAlert('Could not copy — your browser may not support this.', 'error'));
+}
+
+/* =========================================================================
+   SECTION 10: PAGE RENDER FUNCTIONS
+========================================================================= */
+function renderNav(){
+  const links = document.getElementById('navLinks');
+  if (!currentUser) {
+    links.innerHTML = `
+      <a class="navbtn" onclick="navigateTo('home')">Home</a>
+      <a class="navbtn" onclick="navigateTo('browse-exams')">Take an Exam</a>
+      <a class="navbtn" onclick="navigateTo('login')">Login</a>
+      <a class="navbtn" onclick="navigateTo('register')">Register</a>`;
+  } else {
+    links.innerHTML = `
+      <span class="nav-tag">${currentUser.name} &middot; ${currentUser.role}</span>
+      <button id="logoutBtn">Logout</button>`;
+    document.getElementById('logoutBtn').onclick = logout;
+  }
+}
+
+function renderHome(){
+  return `
+  <div class="hero fade-in">
+    <h1>📝 Online CBT Exam System</h1>
+    <p>Create, take, and grade computer-based tests — instantly, automatically, anywhere.</p>
+    <div class="hero-buttons">
+      <button class="btn btn-outline" onclick="navigateTo('browse-exams')">Take an Exam</button>
+      <button class="btn btn-primary" onclick="navigateTo('login')">Teacher / Admin Login</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="features-grid">
+      <div class="feature-card slide-in"><div class="icon">🛠️</div><h3>For Admins</h3><p>Manage all teachers, monitor system-wide statistics, and export results to Word or PDF.</p></div>
+      <div class="feature-card slide-in" style="animation-delay:.1s"><div class="icon">🧑‍🏫</div><h3>For Teachers</h3><p>Build multiple-choice exams in minutes, mark answers automatically, and review results per exam.</p></div>
+      <div class="feature-card slide-in" style="animation-delay:.2s"><div class="icon">🎓</div><h3>For Students</h3><p>No account needed — just pick an exam, enter your name and class, and start. Instant results at the end.</p></div>
+    </div>
+  </div>`;
+}
+
+function renderLogin(){
+  return `
+  <div class="container">
+    <div class="card form-narrow fade-in" style="border:2px dashed #764ba2;">
+      <h3 class="center">First time setup</h3>
+      <p class="muted center mb10">No admin account yet? Tap below to create the default one — safe to tap even if it already exists.</p>
+      <button class="btn btn-primary btn-block" id="setupAdminBtn">Create Admin Account</button>
+      <p class="center mt10 muted">Will create: <strong>admin@cbt.com</strong> / <strong>admin123</strong></p>
+    </div>
+    <div class="card form-narrow fade-in">
+      <h2 class="center">Teacher / Admin Login</h2>
+      <div class="form-group"><label>Email</label><input id="loginEmail" type="email" placeholder="you@example.com"></div>
+      <div class="form-group"><label>Password</label><input id="loginPassword" type="password" placeholder="••••••••"></div>
+      <button class="btn btn-primary btn-block" id="loginBtn">Login</button>
+      <p class="center mt20 muted">No account? <a style="color:#764ba2;font-weight:700;cursor:pointer;" onclick="navigateTo('register')">Register as a teacher</a></p>
+    </div>
+  </div>`;
+}
+
+function renderRegister(){
+  return `
+  <div class="container">
+    <div class="card form-narrow fade-in">
+      <h2 class="center">Teacher Registration</h2>
+      <p class="muted center mb10">Students don't register — they just pick an exam from "Take an Exam."</p>
+      <div class="form-group"><label>Full Name</label><input id="regName" placeholder="Jane Doe"></div>
+      <div class="form-group"><label>Email</label><input id="regEmail" type="email" placeholder="you@example.com"></div>
+      <div class="form-group"><label>Password</label><input id="regPassword" type="password" placeholder="At least 6 characters"></div>
+      <button class="btn btn-primary btn-block" id="registerBtn">Register</button>
+      <p class="center mt20 muted">Already have an account? <a style="color:#764ba2;font-weight:700;cursor:pointer;" onclick="navigateTo('login')">Login</a></p>
+    </div>
+  </div>`;
+}
+
+function renderAdmin(state){
+  const tab = activeTab['admin'] || 'users';
+  const { users, exams, attempts } = state;
+
+  let body = '';
+  if (tab === 'users') {
+    body = `
+    <div class="table-wrap">
+    <table><thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+    <tbody>${users.map(u => `<tr><td>${u.name}</td><td>${u.email}</td><td><span class="badge badge-role">${u.role}</span></td></tr>`).join('') || '<tr><td colspan="3" class="center muted">No users yet.</td></tr>'}</tbody>
+    </table></div>
+    <button class="btn btn-word mt20" id="downloadUsersBtn">📄 Download as Word</button>`;
+  } else {
+    body = `
+    <div class="table-wrap">
+    <table><thead><tr><th>Title</th><th>Subject</th><th>Teacher</th><th>Duration</th><th>Pass Mark</th><th>Action</th></tr></thead>
+    <tbody>${exams.map(e => `<tr><td>${e.title}</td><td>${e.subject}</td><td>${e.teacherName}</td><td>${e.duration} min</td><td>${e.passMark}%</td>
+      <td>
+        <button class="btn btn-success btn-sm" onclick="navigateTo('results',{examId:'${e.id}'})">Results</button>
+        <button class="btn btn-danger btn-sm" onclick="window.__deleteExam('${e.id}')">Delete</button>
+      </td></tr>`).join('') || '<tr><td colspan="6" class="center muted">No exams yet.</td></tr>'}</tbody>
+    </table></div>`;
+  }
+
+  const html = `
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card fade-in"><div class="num">${users.length}</div><div class="label">Teachers / Admins</div></div>
+      <div class="stat-card fade-in" style="animation-delay:.1s"><div class="num">${exams.length}</div><div class="label">Total Exams</div></div>
+      <div class="stat-card fade-in" style="animation-delay:.2s"><div class="num">${attempts.length}</div><div class="label">Exam Attempts</div></div>
+    </div>
+    <div class="card slide-in">
+      <h2>Admin Dashboard</h2>
+      <div class="tabs">
+        <button class="tab-btn ${tab==='users'?'active':''}" onclick="switchTab('admin','users')">Users</button>
+        <button class="tab-btn ${tab==='exams'?'active':''}" onclick="switchTab('admin','exams')">Exams</button>
+      </div>
+      ${body}
+    </div>
+  </div>`;
+  window.__adminUsers = users;
+  return html;
+}
+
+function renderTeacher(state){
+  const tab = activeTab['teacher'] || 'my-exams';
+  const { myExams, questionCounts } = state;
+
+  let body = '';
+  if (tab === 'my-exams') {
+    body = `
+    <div class="table-wrap">
+    <table><thead><tr><th>Title</th><th>Subject</th><th>Duration</th><th>Pass Mark</th><th>Questions</th><th>Actions</th></tr></thead>
+    <tbody>${myExams.map(e => `<tr>
+        <td>${e.title}</td><td>${e.subject}</td><td>${e.duration} min</td><td>${e.passMark}%</td><td>${questionCounts[e.id]||0}</td>
+        <td>
+          <button class="btn btn-outline btn-sm" style="color:#764ba2;border-color:#764ba2;" onclick="navigateTo('questions',{examId:'${e.id}'})">Questions</button>
+          <button class="btn btn-success btn-sm" onclick="navigateTo('results',{examId:'${e.id}'})">Results</button>
+          <button class="btn btn-danger btn-sm" onclick="window.__deleteExam('${e.id}')">Delete</button>
+        </td></tr>`).join('') || '<tr><td colspan="6" class="center muted">You have not created any exams yet.</td></tr>'}</tbody>
+    </table></div>`;
+  } else {
+    body = `
+    <div class="grid-2 form-narrow" style="max-width:520px;">
+      <div class="form-group" style="grid-column:1/-1;"><label>Exam Title</label><input id="examTitle" placeholder="e.g. Mid-Term Mathematics"></div>
+      <div class="form-group"><label>Subject</label><input id="examSubject" placeholder="e.g. Mathematics"></div>
+      <div class="form-group"><label>Duration (minutes)</label><input id="examDuration" type="number" min="1" placeholder="30"></div>
+      <div class="form-group" style="grid-column:1/-1;"><label>Pass Mark (%)</label><input id="examPassMark" type="number" min="1" max="100" placeholder="50"></div>
+      <button class="btn btn-primary btn-block" id="createExamBtn" style="grid-column:1/-1;">Create Exam</button>
+    </div>`;
+  }
+
+  return `
+  <div class="container">
+    <div class="card slide-in">
+      <h2>Teacher Dashboard</h2>
+      <div class="tabs">
+        <button class="tab-btn ${tab==='my-exams'?'active':''}" onclick="switchTab('teacher','my-exams')">My Exams</button>
+        <button class="tab-btn ${tab==='create'?'active':''}" onclick="switchTab('teacher','create')">Create Exam</button>
+      </div>
+      ${body}
+    </div>
+  </div>`;
+}
+
+function renderQuestions(state){
+  const { exam, questions } = state;
+  if (!exam) return `<div class="container"><div class="card center">Exam not found. <button class="btn btn-primary mt10" onclick="navigateTo('teacher')">Back</button></div></div>`;
+  return `
+  <div class="container">
+    <div class="card slide-in">
+      <h2>Questions — ${exam.title}</h2>
+      <p class="muted mb10">Total marks so far: ${exam.totalMarks}</p>
+      <div class="grid-2">
+        <div class="form-group" style="grid-column:1/-1;"><label>Question Text</label><textarea id="qText" rows="2" placeholder="Enter the question"></textarea></div>
+        <div class="form-group"><label>Marks</label><input id="qMarks" type="number" min="1" value="1"></div>
+        <div class="form-group"></div>
+        <div class="form-group"><label>Option A</label><input id="qOptA" placeholder="Option A"></div>
+        <div class="form-group"><label>Option B</label><input id="qOptB" placeholder="Option B"></div>
+        <div class="form-group"><label>Option C</label><input id="qOptC" placeholder="Option C"></div>
+        <div class="form-group"><label>Option D</label><input id="qOptD" placeholder="Option D"></div>
+        <div class="form-group" style="grid-column:1/-1;"><label>Correct Option</label>
+          <select id="qCorrect"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="addQuestionBtn">Add Question</button>
+      <button class="btn btn-outline mt10" style="color:#764ba2;border:2px solid #764ba2;" onclick="navigateTo('teacher')">Back to My Exams</button>
+    </div>
+    <div class="card slide-in">
+      <h3>Existing Questions (${questions.length})</h3>
+      ${questions.map((q,i) => `
+        <div class="q-box">
+          <div class="q-title">${i+1}. ${q.text} <span class="muted">(${q.marks} mark${q.marks>1?'s':''})</span></div>
+          ${q.options.map((opt,idx) => `<div class="option-row ${idx===q.correctIndex?'selected':''}">${String.fromCharCode(65+idx)}. ${opt} ${idx===q.correctIndex?' ✅':''}</div>`).join('')}
+          <button class="btn btn-danger btn-sm mt10" onclick="window.__deleteQuestion('${q.id}','${exam.id}')">Delete</button>
+        </div>`).join('') || '<p class="muted">No questions added yet.</p>'}
+    </div>
+  </div>`;
+}
+
+function renderExamsBrowse(exams){
+  return `
+  <div class="container">
+    <div class="card slide-in">
+      <h2>Available Exams</h2>
+      <p class="muted mb10">No account needed — tap Start, enter your name and class, and begin.</p>
+      <div class="table-wrap">
+      <table><thead><tr><th>Title</th><th>Subject</th><th>Duration</th><th>Pass Mark</th><th></th></tr></thead>
+      <tbody>${exams.map(e => `<tr><td>${e.title}</td><td>${e.subject}</td><td>${e.duration} min</td><td>${e.passMark}%</td>
+        <td><button class="btn btn-primary btn-sm" onclick="navigateTo('exam-intro',{examId:'${e.id}'})">Start</button></td></tr>`).join('') || '<tr><td colspan="5" class="center muted">No exams published yet.</td></tr>'}</tbody>
+      </table></div>
+    </div>
+  </div>`;
+}
+
+function renderExamIntro(exam){
+  if (!exam) return `<div class="container"><div class="card center">Exam not found. <button class="btn btn-primary mt10" onclick="navigateTo('browse-exams')">Back</button></div></div>`;
+  if (localStorage.getItem('cbt_done_' + exam.id)) {
+    return `<div class="container"><div class="card form-narrow center fade-in">
+      <h2>Already Completed</h2>
+      <p class="muted mt10">This exam was already completed on this device.</p>
+      <button class="btn btn-primary mt20" onclick="navigateTo('browse-exams')">Back to Exams</button>
+    </div></div>`;
+  }
+  const options = CLASS_LIST.map(c => `<option value="${c}">${c}</option>`).join('');
+  return `
+  <div class="container">
+    <div class="card form-narrow fade-in">
+      <h2 class="center">${exam.title}</h2>
+      <p class="muted center mb10">${exam.subject} &middot; ${exam.duration} min &middot; Pass mark ${exam.passMark}%</p>
+      <div class="form-group"><label>Full Name</label><input id="introName" placeholder="Enter your full name"></div>
+      <div class="form-group"><label>Class</label>
+        <select id="introClass"><option value="">Select your class...</option>${options}</select>
+      </div>
+      <button class="btn btn-success btn-block" id="beginExamBtn">Start Exam</button>
+    </div>
+  </div>`;
+}
+
+function renderExam(state){
+  const { exam, questions } = state;
+  if (!exam) return `<div class="container"><div class="card center">Exam not found.</div></div>`;
+  const startKey = 'cbt_start_' + exam.id;
+  const startTime = Number(localStorage.getItem(startKey)) || Date.now();
+  const endTime = startTime + exam.duration * 60000;
+
+  setTimeout(() => setupExamTimer(exam.id, endTime), 0);
+
+  return `
+  <div class="container">
+    <div class="exam-header">
+      <div><h2>${exam.title}</h2><p class="muted">${pageParams.studentName || ''} &middot; ${pageParams.studentClass || ''}</p></div>
+      <div class="timer" id="examTimerDisplay">--:--</div>
+    </div>
+    ${questions.map((q,i) => `
+      <div class="q-box fade-in">
+        <div class="q-title">${i+1}. ${q.text} <span class="muted">(${q.marks} mark${q.marks>1?'s':''})</span></div>
+        ${q.options.map((opt,idx) => `
+          <div class="option-row ${selectedAnswers[q.id]===idx?'selected':''}" onclick="window.__selectAnswer('${q.id}',${idx})">
+            <input type="radio" name="q_${q.id}" ${selectedAnswers[q.id]===idx?'checked':''} readonly>
+            <span>${String.fromCharCode(65+idx)}. ${opt}</span>
+          </div>`).join('')}
+      </div>`).join('') || '<div class="card center muted">This exam has no questions yet.</div>'}
+    <button class="btn btn-success btn-block" id="submitExamBtn">Submit Exam</button>
+  </div>`;
+}
+
+function setupExamTimer(examId, endTime){
+  if (examTimerInterval) clearInterval(examTimerInterval);
+  const display = document.getElementById('examTimerDisplay');
+  if (!display) return;
+  function tick(){
+    const remaining = endTime - Date.now();
+    const el = document.getElementById('examTimerDisplay');
+    if (!el) { clearInterval(examTimerInterval); return; }
+    if (remaining <= 0) {
+      el.textContent = '00:00';
+      clearInterval(examTimerInterval);
+      submitExam(examId, true);
+      return;
+    }
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    el.textContent = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+  }
+  tick();
+  examTimerInterval = setInterval(tick, 1000);
+}
+
+function renderExamDone(p){
+  return `
+  <div class="container">
+    <div class="card form-narrow fade-in center">
+      <h2>${p.passed ? '🎉 You Passed!' : 'Exam Submitted'}</h2>
+      <p class="mt20">${p.title}</p>
+      <p style="font-size:2rem;font-weight:800;color:#764ba2;margin:10px 0;">${p.score} / ${p.totalMarks}</p>
+      <p class="muted">${p.percentage}% — <span class="badge ${p.passed?'badge-pass':'badge-fail'}">${p.passed?'PASS':'FAIL'}</span></p>
+      <button class="btn btn-primary btn-block mt20" onclick="navigateTo('browse-exams')">Back to Exams</button>
+    </div>
+  </div>`;
+}
+
+function renderResults(state){
+  const { exam, attempts } = state;
+  if (!exam) return `<div class="container"><div class="card center">Exam not found.</div></div>`;
+  const sorted = [...attempts].sort((a,b) => {
+    const ci = CLASS_LIST.indexOf(a.studentClass) - CLASS_LIST.indexOf(b.studentClass);
+    if (ci !== 0) return ci;
+    return (a.studentName||'').localeCompare(b.studentName||'');
+  });
+  window.__resultsExam = exam;
+  window.__resultsRows = sorted.map(a => [a.studentName, a.studentClass, a.score+'/'+a.totalMarks, a.percentage+'%', a.passed?'PASS':'FAIL']);
+  const backPage = currentUser && currentUser.role === 'admin' ? 'admin' : 'teacher';
+  return `
+  <div class="container">
+    <div class="card slide-in">
+      <h2>Results — ${exam.title}</h2>
+      <p class="muted mb10">Sorted by class, then name.</p>
+      <div class="table-wrap">
+      <table><thead><tr><th>Name</th><th>Class</th><th>Score</th><th>Percentage</th><th>Status</th></tr></thead>
+      <tbody>${sorted.map(a => `<tr><td>${a.studentName}</td><td>${a.studentClass}</td><td>${a.score}/${a.totalMarks}</td><td>${a.percentage}%</td>
+        <td><span class="badge ${a.passed?'badge-pass':'badge-fail'}">${a.passed?'PASS':'FAIL'}</span></td></tr>`).join('') || '<tr><td colspan="5" class="center muted">No submissions yet.</td></tr>'}</tbody>
+      </table></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;">
+        <button class="btn btn-word" id="downloadResultsWordBtn">📄 Word</button>
+        <button class="btn btn-word" style="background:linear-gradient(135deg,#c0392b,#922b21);" id="downloadResultsPdfBtn">📕 PDF</button>
+        <button class="btn btn-outline" style="color:#764ba2;border:2px solid #764ba2;" id="copyResultsBtn">📋 Copy</button>
+      </div>
+      <button class="btn btn-outline mt10" style="color:#764ba2;border:2px solid #764ba2;" onclick="navigateTo('${backPage}')">Back</button>
+    </div>
+  </div>`;
+}
+
+/* =========================================================================
+   SECTION 11: MAIN ROUTER + EVENT WIRING
+========================================================================= */
+async function render(){
+  renderNav();
+  const app = document.getElementById('app');
+  showLoader();
+  try {
+    let html = '';
+    if (currentPage === 'home') {
+      html = renderHome();
+    } else if (currentPage === 'browse-exams') {
+      await ensureAnonAuth();
+      const exams = await fetchCollection('exams', [['status','==','published']]);
+      html = renderExamsBrowse(exams);
+    } else if (currentPage === 'exam-intro') {
+      await ensureAnonAuth();
+      const examSnap = await getDoc(doc(db, 'exams', pageParams.examId));
+      const exam = examSnap.exists() ? { id: pageParams.examId, ...examSnap.data() } : null;
+      html = renderExamIntro(exam);
+    } else if (currentPage === 'exam') {
+      await ensureAnonAuth();
+      const examSnap = await getDoc(doc(db, 'exams', pageParams.examId));
+      const exam = examSnap.exists() ? { id: pageParams.examId, ...examSnap.data() } : null;
+      const questions = exam ? await fetchCollection('questions', [['examId','==',exam.id]]) : [];
+      html = renderExam({ exam, questions });
+    } else if (currentPage === 'exam-done') {
+      html = renderExamDone(pageParams);
+    } else if (!currentUser) {
+      if (currentPage === 'login') html = renderLogin();
+      else if (currentPage === 'register') html = renderRegister();
+      else html = renderHome();
+    } else if (currentUser.role === 'admin' && currentPage === 'admin') {
+      const [users, exams, attempts] = await Promise.all([
+        fetchCollection('users'), fetchCollection('exams'), fetchCollection('attempts')
+      ]);
+      html = renderAdmin({ users, exams, attempts });
+    } else if (currentUser.role === 'teacher' && currentPage === 'teacher') {
+      const myExams = await fetchCollection('exams', [['teacherId','==',currentUser.id]]);
+      const questionCounts = {};
+      for (const e of myExams) {
+        const qs = await fetchCollection('questions', [['examId','==',e.id]]);
+        questionCounts[e.id] = qs.length;
+      }
+      html = renderTeacher({ myExams, questionCounts });
+    } else if (currentPage === 'questions') {
+      const examSnap = await getDoc(doc(db, 'exams', pageParams.examId));
+      const exam = examSnap.exists() ? { id: pageParams.examId, ...examSnap.data() } : null;
+      const questions = exam ? await fetchCollection('questions', [['examId','==',exam.id]]) : [];
+      html = renderQuestions({ exam, questions });
+    } else if (currentPage === 'results') {
+      const examSnap = await getDoc(doc(db, 'exams', pageParams.examId));
+      const exam = examSnap.exists() ? { id: pageParams.examId, ...examSnap.data() } : null;
+      const attempts = exam ? await fetchCollection('attempts', [['examId','==',exam.id]]) : [];
+      html = renderResults({ exam, attempts });
+    } else {
+      html = currentUser.role === 'admin' ? renderAdmin({users:[],exams:[],attempts:[]}) : renderTeacher({myExams:[],questionCounts:{}});
+    }
+    app.innerHTML = html;
+    wireEvents();
+  } catch (err) {
+    showAlert('Error loading page: ' + err.message, 'error');
+  } finally {
+    hideLoader();
+  }
+}
+
+function wireEvents(){
+  const loginBtn = document.getElementById('loginBtn');
+  if (loginBtn) loginBtn.onclick = () => loginUser(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+
+  const setupAdminBtn = document.getElementById('setupAdminBtn');
+  if (setupAdminBtn) setupAdminBtn.onclick = setupDefaultAdmin;
+
+  const registerBtn = document.getElementById('registerBtn');
+  if (registerBtn) registerBtn.onclick = () => registerTeacher(
+    document.getElementById('regName').value, document.getElementById('regEmail').value, document.getElementById('regPassword').value);
+
+  const beginExamBtn = document.getElementById('beginExamBtn');
+  if (beginExamBtn) beginExamBtn.onclick = () => beginExam(
+    pageParams.examId, document.getElementById('introName').value, document.getElementById('introClass').value);
+
+  const createExamBtn = document.getElementById('createExamBtn');
+  if (createExamBtn) createExamBtn.onclick = () => createExam(
+    document.getElementById('examTitle').value, document.getElementById('examSubject').value,
+    document.getElementById('examDuration').value, document.getElementById('examPassMark').value);
+
+  const addQuestionBtn = document.getElementById('addQuestionBtn');
+  if (addQuestionBtn) addQuestionBtn.onclick = () => addQuestion(
+    pageParams.examId, document.getElementById('qText').value, document.getElementById('qMarks').value,
+    [document.getElementById('qOptA').value, document.getElementById('qOptB').value, document.getElementById('qOptC').value, document.getElementById('qOptD').value],
+    document.getElementById('qCorrect').value);
+
+  const submitExamBtn = document.getElementById('submitExamBtn');
+  if (submitExamBtn) submitExamBtn.onclick = () => {
+    if (confirm('Submit your exam now? You cannot change answers after submitting.')) submitExam(pageParams.examId, false);
+  };
+
+  const downloadUsersBtn = document.getElementById('downloadUsersBtn');
+  if (downloadUsersBtn) downloadUsersBtn.onclick = () => exportToWord(
+    'All Users Report', ['Name','Email','Role'],
+    (window.__adminUsers||[]).map(u => [u.name, u.email, u.role]), 'users-report');
+
+  const downloadResultsWordBtn = document.getElementById('downloadResultsWordBtn');
+  if (downloadResultsWordBtn) downloadResultsWordBtn.onclick = () => {
+    const exam = window.__resultsExam;
+    exportToWord('Results — ' + exam.title, ['Name','Class','Score','Percentage','Status'], window.__resultsRows||[], 'results-' + exam.title.replace(/\s+/g,'-'));
+  };
+  const downloadResultsPdfBtn = document.getElementById('downloadResultsPdfBtn');
+  if (downloadResultsPdfBtn) downloadResultsPdfBtn.onclick = () => {
+    const exam = window.__resultsExam;
+    exportToPDF('Results — ' + exam.title, ['Name','Class','Score','Percentage','Status'], window.__resultsRows||[], 'results-' + exam.title.replace(/\s+/g,'-'));
+  };
+  const copyResultsBtn = document.getElementById('copyResultsBtn');
+  if (copyResultsBtn) copyResultsBtn.onclick = () => copyResultsToClipboard(['Name','Class','Score','Percentage','Status'], window.__resultsRows||[]);
+
+  window.__deleteExam = deleteExam;
+  window.__deleteQuestion = deleteQuestion;
+  window.__selectAnswer = selectAnswer;
+}
+
+/* =========================================================================
+   SECTION 12: INITIAL RENDER
+========================================================================= */
+render();
+</script>
+</body>
+</html>
